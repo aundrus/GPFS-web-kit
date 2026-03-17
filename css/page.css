@@ -1,0 +1,57 @@
+/* Core Layout */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* Updated Header: Removed absolute positioning so it doesn't overlap content */
+#header {
+    width: 100%;
+    background-image: linear-gradient(grey, #FFF);
+    padding: 10px 0;
+}
+
+/* Main Container: This now handles the 1% gaps */
+#main-content {
+    display: flex;
+    flex-direction: row;
+    gap: 1vw;           /* Exactly 1% of screen width */
+    padding: 20px 1vw;  /* 1% padding on sides */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Individual Panels */
+.panel {
+    position: relative;
+    min-height: 220px;
+    background: #FFF;
+    border: solid 1px #e3e9f7;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+#left {
+    flex: 15; /* Replaces width: 200px */
+}
+
+#center {
+    flex: 60; /* Replaces the huge margins (212px/312px) */
+}
+
+#right {
+    flex: 25; /* Replaces width: 300px */
+}
+
+/* Chart Container Helpers */
+#treemap {
+    height: auto;
+    min-height: 200px;
+}
+
+#column {
+    height: auto;
+    min-height: 300px;
+}

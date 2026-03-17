@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="GPFS">
+    <title>GPFS</title>
+    <link rel="stylesheet" type="text/css" href="css/page.css">
+    <link rel="stylesheet" type="text/css" href="css/jqueryFileTree.css" media="screen" />
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+        background: linear-gradient(120deg, #e3e9f7 0%, #f6f7fb 100%);
+        color: #1a2233;
+        min-height: 100vh;
+      }
+      #header {
+        background: linear-gradient(90deg, #76b7ff 0%, #b89bff 100%);
+        color: #fff;
+        padding: 36px 0 80px 0; /* Make header taller */
+        text-align: center;
+        box-shadow: 0 2px 16px rgba(118,183,255,0.10);
+        position: relative;
+        z-index: 10;
+      }
+      #header h1 {
+        margin: 0;
+        font-size: 2.3rem;
+        letter-spacing: 1px;
+      }
+      #header .subtitle {
+        font-size: 1.08rem;
+        color: #3a4a6b;
+        margin-top: 18px;
+        margin-bottom: 20px; /* Space below subtitle */
+        font-weight: 400;
+        background: #fffbe6;
+        border-radius: 8px;
+        padding: 12px 18px;
+        box-shadow: 0 2px 8px rgba(255, 235, 59, 0.08);
+        display: block;
+        border: 1px solid #ffe082;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+        /* Removed absolute positioning properties */
+        position: relative; 
+      }
+ 
+      /* Main Container */
+      body #main-content {
+        display: flex;
+        flex-direction: row;
+        gap: 1vw;
+        padding: 0 1vw;
+        width: 100%;
+        margin-top: 90px; /* Push panels down away from the header */
+        box-sizing: border-box;
+        position: relative;
+        z-index: 1;
+    }
+
+      /* Panel Widths - Forced override of page.css */
+      body #left.panel {
+          flex: 15 1 0; 
+          width: auto;
+          float: none;
+          margin: 0;
+      }
+
+      body #center.panel {
+          flex: 60 1 0; 
+          width: auto;
+          margin: 0;
+      }
+
+      body #right.panel {
+          flex: 25 1 0; 
+          width: auto;
+          float: none;
+          margin: 0;
+      }
+
+      body .panel {
+          background: #FFF;
+          border: solid 1px #e3e9f7;
+          border-radius: 10px;
+          padding: 15px;
+          box-sizing: border-box;
+          min-height: 220px;
+          display: flex;
+          flex-direction: column;
+      }
+      .panel h2 {
+        font-size: 1.13rem;
+        margin: 0 0 12px 0;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      .folders-title { color: #76b7ff; }
+      .dashboard-title { color: #b89bff; }
+      .visual-title { color: #a6f3d0; }
+      #center.panel > div {
+        width: 100%;
+        min-height: 180px;
+        background: #f6f7fb;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(118,183,255,0.07);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow-x: auto;
+        margin: 0 0 10px 0; /* Remove auto centering, reduce bottom margin */
+      }
+      #center.panel > div:empty {
+        min-height: 0;
+        box-shadow: none;
+        background: none;
+        margin-bottom: 0;
+      }
+      .footer {
+        margin: 48px auto 0 auto;
+        text-align: center;
+        color: #888;
+        font-size: 0.98rem;
+        padding: 18px 0 12px 0;
+      }
+      @media (max-width: 1000px) {
+        #main-content {
+          flex-direction: column;
+          align-items: center;
+          /* Keeps the gap consistent at 1% even when stacked */
+          gap: 1vw; 
+          margin: 120px auto 0 auto;
+        }
+        .panel { width: 98vw; max-width: 98vw; min-width: 0; }
+        #center.panel { max-width: 98vw; }
+        #center.panel > div { max-width: 98vw; }
+      }
+    </style>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/jquery.easing.js"></script>
+    <script type="text/javascript" src="js/jqueryFileTree.js" ></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="js/gpfs.js"></script>
+    <script type="text/javascript">
+    $(document).ready( function() {
+        $('#left').fileTree({ root: '../', script: 'connectors/jqueryFileTree.php' }, function(file) { 
+        });
+    });
+    </script>
+</head>
+<body>
+<div id="header">
+    <h1>GPFS Dashboard</h1>
+    <div class="subtitle">
+      <b>Under construction:</b> Modern, Responsive File Tree &amp; Dashboard for SCDF GPFS.<br>
+      Estimated ETA: May 2026.<br>
+      The interface and features are continuously being improved.<br>
+      Please continue using the <a href="https://monitoring.sdcc.bnl.gov/Facility/GCE/GPFS/" target="_blank" style="color:#3a4a6b;text-decoration:underline;">current production server</a> in the meantime.
+    </div>
+</div>
+<div id="main-content">
+    <div id="left" class="panel">
+      <h2 class="folders-title">Folders</h2>
+      <style>
+        /* Make folder icons larger */
+        .jqueryFileTree li.directory > a:before {
+          content: '';
+          display: inline-block;
+          vertical-align: middle;
+          width: 1.5em;
+          height: 1.5em;
+          margin-right: 0.4em;
+          background: url('images/folder_open.png') no-repeat center center / contain;
+        }
+      </style>
+      <!-- File tree will be loaded here -->
+    </div>
+    <div id="center" class="panel">
+        <h2 class="visual-title">Plots &amp; Charts</h2>
+        <div id="all_search_name"></div>
+        <div id="all_search_fileset"></div>
+        <div id="treemap"></div>
+        <div id="column"></div>
+    </div>
+    <div id="right" class="panel">
+      <h2 class="dashboard-title">Dashboard</h2>
+      <div id="dashboard">
+        <div id="tablesearch"></div>
+        <div id="table"></div>
+      </div>
+    </div>
+</div>
+<div class="footer">
+  &copy; 2026 SCDF GPFS Web &mdash; Modernized by Alexander Undrus
+</div>
+</body>
+</html>

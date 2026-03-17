@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>SCDF GPFS Web Server Migration</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.72);
+      --panel: rgba(255,255,255,.06);
+      --shadow: 0 12px 40px rgba(0,0,0,.35);
+      --r: 18px;
+
+      --a:#76b7ff;  /* blue */
+      --b:#a6f3d0;  /* mint */
+      --c:#ff9a5b;  /* orange */
+      --d:#b89bff;  /* violet */
+
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f7fb;
+        --text:rgba(10,15,25,.92);
+        --muted:rgba(10,15,25,.68);
+        --panel:#ffffff;
+        --shadow: 0 14px 45px rgba(15,25,45,.12);
+      }
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1400px 700px at 15% -15%, rgba(118,183,255,.22), transparent 55%),
+        radial-gradient(1200px 700px at 98% 0%, rgba(166,243,208,.20), transparent 55%),
+        radial-gradient(1100px 650px at 60% 110%, rgba(184,155,255,.16), transparent 60%),
+        var(--bg);
+    }
+
+    a{color:inherit}
+    a:hover{text-decoration:none}
+
+    .wrap{max-width: 980px; margin:0 auto; padding: 22px}
+    .hero{
+      padding: 18px;
+      border-radius: calc(var(--r) + 6px);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      backdrop-filter: blur(6px);
+    }
+    .hero::before{
+      content:"";
+      position:absolute; inset:0;
+      padding: 2px;
+      border-radius: calc(var(--r) + 6px);
+      background: linear-gradient(135deg, rgba(118,183,255,.95), rgba(166,243,208,.85), rgba(255,154,91,.75), rgba(184,155,255,.85));
+      /* -webkit-mask is for Safari/Chrome, mask is for Firefox/Edge/modern browsers */
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite: exclude;
+      pointer-events:none;
+    }
+
+    .top{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px 16px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+    h1{margin:0; font-size:22px; letter-spacing:.2px}
+    .sub{margin:6px 0 0 0; color:var(--muted); line-height:1.45; max-width: 80ch}
+
+    .pillrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      font-size:12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--a);
+      box-shadow: 0 0 0 3px rgba(118,183,255,.18);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (max-width: 860px){ .grid{grid-template-columns:1fr} .wrap{padding:16px} }
+
+    .card{
+      border-radius: var(--r);
+      background: rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:0;
+      padding: 2px;
+      border-radius: var(--r);
+      background: linear-gradient(135deg, rgba(118,183,255,.85), rgba(166,243,208,.75), rgba(255,154,91,.55));
+      /* -webkit-mask is for Safari/Chrome, mask is for Firefox/Edge/modern browsers */
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite: exclude;
+      pointer-events:none;
+      opacity: .95;
+    }
+    .card:nth-child(2)::before{
+      background: linear-gradient(135deg, rgba(184,155,255,.85), rgba(118,183,255,.70), rgba(166,243,208,.70));
+    }
+
+    .hd{
+      padding: 14px 14px 8px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), transparent);
+      display:flex; justify-content:space-between; align-items:baseline; gap:10px;
+      position: relative;
+    }
+    .hd h2{margin:0; font-size:13px; letter-spacing:.2px}
+    .hd small{color:var(--muted); font-size:12px}
+    .bd{padding: 12px 14px 14px 14px; position: relative;}
+    ul{margin: 8px 0 0 18px}
+    li{margin: 6px 0}
+    code{font-family:var(--mono); font-size:.95em}
+
+    .contact{
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: var(--r);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: var(--shadow);
+      display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; justify-content:space-between;
+    }
+    .contact b{font-weight:650}
+    .contact a{
+      display:inline-flex; gap:8px; align-items:center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      text-decoration:none;
+      font-size: 12px;
+    }
+    .contact a:hover{background: rgba(255,255,255,.10)}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="top">
+        <div>
+          <h1>SCDF GPFS Web Server Migration</h1>
+          <p class="sub">
+            Modernizing the SCDF GPFS dashboard web service from <b>RHEL 6 / PHP 5.3</b> to
+            <b>RHEL 9 / PHP 8.2</b>, with a clean <b>HTML5</b> front-end for a safer, more maintainable platform.
+          </p>
+        </div>
+        <div class="pillrow" aria-label="Project status">
+          <span class="pill"><span class="dot" aria-hidden="true"></span> Status: <b>Ongoing</b> (since Feb 17)</span>
+          <span class="pill">Target: <b>RH9</b> + <b>PHP 8.2</b></span>
+        </div>
+      </div>
+    </header>
+
+    <section class="grid" aria-label="Purpose and advantages">
+      <article class="card">
+        <div class="hd">
+          <h2>Purpose</h2>
+          <small>What we’re doing</small>
+        </div>
+        <div class="bd">
+          <ul>
+            <li>Move off end-of-life infrastructure and align with supported security baselines.</li>
+            <li>Keep the dashboard familiar while improving readability and responsiveness.</li>
+            <li>Reduce operational risk and simplify long-term maintenance.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="hd">
+          <h2>Advantages</h2>
+          <small>Why it’s worth it</small>
+        </div>
+        <div class="bd">
+          <ul>
+            <li><b>Security:</b> supported OS/runtime, modern TLS/browser compatibility.</li>
+            <li><b>Reliability:</b> fewer legacy dependencies, cleaner runtime behavior.</li>
+            <li><b>Maintainability:</b> easier updates, clearer code paths, better tooling.</li>
+            <li><b>User experience:</b> responsive HTML5 layout that looks good on modern screens.</li>
+          </ul>
+        </div>
+      </article>
+    </section>
+
+    <div style="display: flex; justify-content: center; margin: 38px 0 18px 0;">
+      <a href="index_gpfs.html" style="
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 38px;
+        border-radius: 18px;
+        background: var(--a);
+        color: #fff;
+        font-size: 1.25rem;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 0 18px 4px rgba(118,183,255,.25), 0 2px 18px 0 rgba(184,155,255,.12);
+        border: none;
+        outline: none;
+        transition: box-shadow .2s, transform .2s, background .2s;
+        filter: drop-shadow(0 0 8px var(--a));
+        position: relative;
+        z-index: 2;
+      "
+      onmouseover="this.style.boxShadow='0 0 32px 10px rgba(118,183,255,.35), 0 2px 24px 0 rgba(184,155,255,.18)'; this.style.transform='scale(1.04)';"
+      onmouseout="this.style.boxShadow='0 0 18px 4px rgba(118,183,255,.25), 0 2px 18px 0 rgba(184,155,255,.12)'; this.style.transform='scale(1)';"
+      >
+        <span style="font-size:1.5em;">🚀</span> Open New GPFS Web
+      </a>
+    </div>
+
+    <div class="contact" aria-label="Contact">
+      <div>
+        <b>Contact:</b> Alexander Undrus &nbsp;•&nbsp; <code>undrus@bnl.gov</code>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <a href="mailto:undrus@bnl.gov">✉️ Email Alexander</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
